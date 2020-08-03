@@ -30,35 +30,43 @@ public class BowlingGame {
 
   public int getScore() {
     int score = 0;
-    // count first nine throw
     for (int framePoint = 0; framePoint < 9; framePoint++) {
-      ArrayList<Integer> curFrame = this.scoreList.get(framePoint);
-
-      int firstScore = curFrame.get(0);
-      if (firstScore == FULL_MARKS_SCORE) {
-        score += firstScore + this.getNextTwoThrowScore(framePoint);
-      } else {
-        int secondScore = curFrame.get(1);
-        if (firstScore + secondScore == FULL_MARKS_SCORE) {
-          score += FULL_MARKS_SCORE + this.scoreList.get(framePoint + 1).get(0);
-        } else {
-          score += firstScore + secondScore;
-        }
-      }
+      score += this.getFirstNineFrameScore(framePoint);
     }
+    return score + this.getTheTenthFrameScore();
+  }
 
-    // count the tenth throw
+  private int getTheTenthFrameScore() {
+    int score = 0;
     ArrayList<Integer> theTenthThrow = this.scoreList.get(9);
     int firstScore = theTenthThrow.get(0);
     int secondScore = theTenthThrow.get(1);
     if (firstScore == FULL_MARKS_SCORE) {
       score += firstScore + secondScore + theTenthThrow.get(2);
     } else if (firstScore + secondScore == FULL_MARKS_SCORE) {
-      score += FULL_MARKS_SCORE + theTenthThrow.get(2);
+      int thirdScore = theTenthThrow.get(2);
+      score += FULL_MARKS_SCORE + thirdScore;
     } else {
       score += firstScore + secondScore;
     }
+    return score;
+  }
 
+  private int getFirstNineFrameScore(int curFrameNum) {
+    int score = 0;
+    ArrayList<Integer> curFrame = this.scoreList.get(curFrameNum);
+
+    int firstScore = curFrame.get(0);
+    if (firstScore == FULL_MARKS_SCORE) {
+      score += firstScore + this.getNextTwoThrowScore(curFrameNum);
+    } else {
+      int secondScore = curFrame.get(1);
+      if (firstScore + secondScore == FULL_MARKS_SCORE) {
+        score += FULL_MARKS_SCORE + this.scoreList.get(curFrameNum + 1).get(0);
+      } else {
+        score += firstScore + secondScore;
+      }
+    }
     return score;
   }
 
@@ -67,11 +75,13 @@ public class BowlingGame {
     int nextScore = nextFrame.get(0);
     int nextNextScore;
     if (nextScore == FULL_MARKS_SCORE) {
-      // next throw is the tenth throw
-      if (this.frame + 1 == 9) {
+      // next frame is the tenth frame
+      int nextFrameNum = curFramePoint + 1 + 1;
+      if (nextFrameNum == MAX_FRAME_TIMES) {
         nextNextScore = nextFrame.get(1);
       } else {
-        nextNextScore = this.scoreList.get(curFramePoint + 2).get(0);
+        int nextNextFrameIndex = curFramePoint +2;
+        nextNextScore = this.scoreList.get(nextNextFrameIndex).get(0);
       }
     } else {
       nextNextScore = nextFrame.get(1);
@@ -90,14 +100,14 @@ public class BowlingGame {
       if (curScore == FULL_MARKS_SCORE) {
         scoreList.get(this.frame).add(curScore);
         // no second throw chance
-        this.frame++;
+        this.moveToNextFrame();
       } else {
         this.getCurFrame().add(curScore);
       }
     } else {
       // second chance
       this.getCurFrame().add(curScore);
-      this.frame++;
+      this.moveToNextFrame();
     }
   }
 
@@ -114,13 +124,17 @@ public class BowlingGame {
         this.getCurFrame().add(curScore);
       } else {
         this.getCurFrame().add(curScore);
-        this.frame++;
+        this.moveToNextFrame();
       }
     }
     // third throw
     else if (this.getCurFrame().size() == 2) {
       this.getCurFrame().add(curScore);
-      this.frame++;
+      this.moveToNextFrame();
     }
+  }
+
+  private void moveToNextFrame () {
+    this.frame++;
   }
 }
